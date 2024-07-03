@@ -1,3 +1,13 @@
+# memShell のフォークほしくなった機能を追加していく
+- ファイルアップロード用のページの追加 binupload
+
+agent.jarに対して機能追加をする。
+コンパイル+source.txtの書き換え後、agent/net を 上書きする。
+inject.jarはそのまま使用する。
+```
+"C:\Program Files\Java\jdk1.8.0_202\bin\jar.exe" cvfm agent.jar META-INF\MANIFEST.MF .
+```
+
 # memShell
 a webshell resides in the memory of java web server
 
